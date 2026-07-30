@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>gRAPID</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Composer</title>
 
     <!-- 1. External Libraries -->
     <link rel="stylesheet" type="text/css" href="https://www.x3dom.org/release/x3dom.css">
@@ -10,41 +11,84 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <!-- 2. Your Local CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/claudestyle.css">
 </head>
 <body>
    <div class="app-grid">
         <header>
-            <div class="brand"><i class="fa-solid fa-atom"></i> Input Composer</div>
+            <!-- Left Section: Branding -->
+            <div class="brand">
+                <i class="fa-solid fa-atom brand-icon"></i>
+                <div class="brand-text">
+                    <span class="brand-name">VT³G</span>
+                    <span class="brand-sub">Neutronics Input Composer</span>
+                </div>
+            </div>
 
-            <button class="toolbar-btn" onclick="exportJSON()"><i class="fa-regular fa-floppy-disk"></i> Export</button>
-            <div class="toolbar-sep"></div>
-            <button class="toolbar-btn" onclick="addShape('Cylinder')"><i class="fa-solid fa-database"></i> +
-                Cylinder</button>
-            <button class="toolbar-btn" onclick="addShape('Box')"><i class="fa-solid fa-cube"></i> + Box</button>
-            <button class="toolbar-btn" onclick="addShape('Sphere')"><i class="fa-solid fa-circle"></i> +
-                Sphere</button>
-            <button class="toolbar-btn" onclick="addGroup()"><i class="fa-solid fa-folder"></i> + Group</button>
-            <div class="toolbar-sep"></div>
-            <button class="toolbar-btn" onclick="openSettings()"><i class="fa-solid fa-gear"></i> Settings</button>
-            <div class="toolbar-sep"></div>
-            <button class="toolbar-btn" onclick="recenterView()" title="Fit camera to scene"><i
-                    class="fa-solid fa-expand"></i> Fit View</button>
+            <div class="ribbon">
+                <!-- Center-Left Section: Geometry -->
+                <div class="ribbon-group">
+                    <div class="ribbon-buttons">
+                        <button class="toolbar-btn" onclick="addShape('Cylinder')"><i class="fa-solid fa-database"></i> + Cylinder</button>
+                        <button class="toolbar-btn" onclick="addShape('Box')"><i class="fa-solid fa-cube"></i> + Box</button>
+                        <button class="toolbar-btn" onclick="addShape('Sphere')"><i class="fa-solid fa-circle"></i> + Sphere</button>
+                        <button class="toolbar-btn" onclick="addGroup()"><i class="fa-solid fa-folder"></i> + Group</button>
+                    </div>
+                    <span class="ribbon-caption">Geometry</span>
+                </div>
+
+                <div class="toolbar-sep"></div>
+
+                <!-- Center-Right Section: Configure -->
+                <div class="ribbon-group">
+                    <div class="ribbon-buttons">
+                        <button class="toolbar-btn" onclick="openSettings()"><i class="fa-solid fa-gear"></i> Settings</button>
+                    </div>
+                    <span class="ribbon-caption">Configure</span>
+                </div>
+            </div>
+
+            <!-- Right Section: Export Dropdown Menu (Replaces Header Tag) -->
+            <div class="export-module">
+                <div class="export-split-btn">
+                    <button class="export-main" onclick="exportModel('json')">
+                        <i class="fa-regular fa-floppy-disk"></i> Export Model
+                    </button>
+                    <button class="export-toggle" onclick="toggleExportMenu()" aria-label="Toggle export options">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="export-dropdown-menu" id="exportDropdown">
+                        <button class="dropdown-item" onclick="exportModel('json')">
+                            <i class="fa-solid fa-code"></i> JSON (.json)
+                        </button>
+                        <button class="dropdown-item" onclick="exportModel('openmc')">
+                            <i class="fa-solid fa-file-code"></i> OpenMC (.xml)
+                        </button>
+                        <button class="dropdown-item" onclick="exportModel('mcnp')">
+                            <i class="fa-solid fa-file-lines"></i> MCNP (.inp)
+                        </button>
+                        <button class="dropdown-item" onclick="exportModel('serpent')">
+                            <i class="fa-solid fa-file-signature"></i> SERPENT (.inp)
+                        </button>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <div class="main-area">
             <div class="panel">
                 <!-- LEFT TABS -->
                 <div class="universe-tabs">
-                    <div class="u-tab active" onclick="showLeftPanel('scene')">Scene</div>
-                    <div class="u-tab" onclick="showLeftPanel('presets')">Presets</div>
-                    <div class="u-tab" onclick="showLeftPanel('materials')">Materials</div>
+                    <div class="u-tab active" onclick="showLeftPanel('scene')"><i class="fa-solid fa-sitemap"></i> Scene</div>
+                    <div class="u-tab" onclick="showLeftPanel('presets')"><i class="fa-solid fa-shapes"></i> Presets</div>
+                    <div class="u-tab" onclick="showLeftPanel('materials')"><i class="fa-solid fa-layer-group"></i> Materials</div>
                 </div>
 
                 <!-- SCENE PANEL -->
                 <div id="panel-scene" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
                     <div class="panel-header">
-                        <span>Scene Hierarchy</span>
+                        <span><i class="fa-solid fa-sitemap"></i> Scene Hierarchy</span>
                         <i class="fa-solid fa-trash-can" onclick="clearScene()" style="cursor:pointer"
                             title="Reset Scene"></i>
                     </div>
@@ -56,7 +100,7 @@
 
                     <!-- RECTANGULAR GRID ACCORDION -->
                     <div class="accordion-header" onclick="toggleAccordion('acc-grid')">
-                        Rectangular Grid <i class="fa-solid fa-chevron-down"></i>
+                        <span class="accordion-title"><i class="fa-solid fa-table-cells"></i> Rectangular Grid</span> <i class="fa-solid fa-chevron-down accordion-chevron"></i>
                     </div>
                     <div id="acc-grid" class="accordion-content active">
                         <!-- 1. Object Type -->
@@ -113,7 +157,7 @@
 
                     <!-- HEXAGONAL GRID ACCORDION -->
                     <div class="accordion-header" onclick="toggleAccordion('acc-hex')">
-                        Hexagonal Grid <i class="fa-solid fa-chevron-down"></i>
+                        <span class="accordion-title"><i class="fa-solid fa-hive"></i> Hexagonal Grid</span> <i class="fa-solid fa-chevron-down accordion-chevron"></i>
                     </div>
                     <div id="acc-hex" class="accordion-content">
                         <!-- Reuse primitives? Or new set? Let's reuse IDs but we need to watch out for conflicts if we use same IDs. 
@@ -170,7 +214,7 @@
 
                     <!-- CIRCULAR LATTICE ACCORDION -->
                     <div class="accordion-header" onclick="toggleAccordion('acc-circular')">
-                        Circular Lattice <i class="fa-solid fa-chevron-down"></i>
+                        <span class="accordion-title"><i class="fa-solid fa-circle-nodes"></i> Circular Lattice</span> <i class="fa-solid fa-chevron-down accordion-chevron"></i>
                     </div>
                     <div id="acc-circular" class="accordion-content">
                         <div class="input-row">
@@ -219,7 +263,7 @@
 
                     <!-- VA RER PARAMETRIC CORE ACCORDION -->
                     <div class="accordion-header" onclick="toggleAccordion('acc-polaris')">
-                        POLARIS Core <i class="fa-solid fa-chevron-down"></i>
+                        <span class="accordion-title"><i class="fa-solid fa-atom"></i> POLARIS Core</span> <i class="fa-solid fa-chevron-down accordion-chevron"></i>
                     </div>
                     <div id="acc-polaris" class="accordion-content">
                         <span class="prop-label" style="margin-top:5px;">PIN GEOMETRY</span>
@@ -315,7 +359,7 @@
 
                     <!-- RBMK ASSEMBLY ACCORDION -->
                     <div class="accordion-header" onclick="toggleAccordion('acc-rbmk')">
-                        RBMK Assembly <i class="fa-solid fa-chevron-down"></i>
+                        <span class="accordion-title"><i class="fa-solid fa-industry"></i> RBMK Assembly</span> <i class="fa-solid fa-chevron-down accordion-chevron"></i>
                     </div>
                     <div id="acc-rbmk" class="accordion-content">
                         <span class="prop-label" style="margin-top:5px;">FUEL PIN RADII (cm)</span>
@@ -367,7 +411,7 @@
                 <!-- MATERIALS PANEL -->
                 <div id="panel-materials" class="panel-content" style="display:none; padding:10px; overflow-y:auto;">
                     <div class="panel-header">
-                        <span>Material Library</span>
+                        <span><i class="fa-solid fa-layer-group"></i> Material Library</span>
                     </div>
                     <div id="matList" style="margin-top:8px;"></div>
                     <button class="mat-btn mat-btn-new" onclick="newMaterial()" style="margin-top:10px;">
@@ -414,6 +458,11 @@
             </div>
 
             <div class="viewport">
+                <span class="vp-corner vp-tl"></span>
+                <span class="vp-corner vp-tr"></span>
+                <span class="vp-corner vp-bl"></span>
+                <span class="vp-corner vp-br"></span>
+                <div class="vp-hud"><i class="fa-solid fa-cube"></i> EXAMINE MODE &middot; X3DOM</div>
                 <x3d id="x3dElement" showStat="false" showLog="false">
                     <scene id="scene" DEF="scene">
                         <environment sortTrans="true" shadowExcludeTransparentObjects="true"></environment>
@@ -492,87 +541,142 @@
 
             <div class="panel">
                 <div class="inspector-tabs">
-                    <div class="i-tab active" onclick="showPanel('props')">Properties</div>
-                    <div class="i-tab" onclick="showPanel('view')">View</div>
+                    <div class="i-tab active" onclick="showPanel('props')"><i class="fa-solid fa-sliders"></i> Properties</div>
+                    <div class="i-tab" onclick="showPanel('view')"><i class="fa-solid fa-video"></i> View</div>
                 </div>
 
                 <div id="panel-props" class="prop-group">
-                    <span class="prop-label">IDENTITY</span>
-                    <div class="input-row">
-                        <label>ID</label>
-                        <input type="text" id="objName" onchange="updateName()">
-                        <button onclick="deleteCurrent()"
-                            style="background:#c0392b; border:none; color:white; border-radius:3px; cursor:pointer; margin-left:5px; padding:0 8px;">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                    <div class="prop-card">
+                        <span class="prop-label"><i class="fa-solid fa-tag"></i> Identity</span>
+                        <div class="input-row">
+                            <label>ID</label>
+                            <input type="text" id="objName" onchange="updateName()">
+                            <button onclick="deleteCurrent()" class="icon-btn-danger" title="Delete object">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <span class="prop-label" style="margin-top:15px">MATERIAL</span>
-                    <div class="input-row">
-                        <select id="matSelect" onchange="updateMaterial()">
-                            <option value="mixed" disabled hidden>-- Multiple --</option>
-                            <!-- Options populated dynamically from MATERIAL_DB -->
-                        </select>
+                    <div class="prop-card">
+                        <span class="prop-label"><i class="fa-solid fa-flask"></i> Material</span>
+                        <div class="input-row">
+                            <select id="matSelect" onchange="updateMaterial()">
+                                <option value="mixed" disabled hidden>-- Multiple --</option>
+                                <!-- Options populated dynamically from MATERIAL_DB -->
+                            </select>
+                        </div>
                     </div>
 
-                    <span class="prop-label" style="margin-top:15px">POSITION (cm)</span>
-                    <div class="input-row"><label>X</label><input type="number" id="posX" step="0.1"
-                            onchange="updatePos()"></div>
-                    <div class="input-row"><label>Y</label><input type="number" id="posY" step="0.1"
-                            onchange="updatePos()"></div>
-                    <div class="input-row"><label>Z</label><input type="number" id="posZ" step="0.1"
-                            onchange="updatePos()"></div>
+                    <div class="prop-card">
+                        <span class="prop-label"><i class="fa-solid fa-arrows-up-down-left-right"></i> Position <em class="unit-tag">cm</em></span>
+                        <div class="input-row"><label>X</label><input type="number" id="posX" step="0.1"
+                                onchange="updatePos()"></div>
+                        <div class="input-row"><label>Y</label><input type="number" id="posY" step="0.1"
+                                onchange="updatePos()"></div>
+                        <div class="input-row"><label>Z</label><input type="number" id="posZ" step="0.1"
+                                onchange="updatePos()"></div>
+                    </div>
 
-                    <span class="prop-label" style="margin-top:15px">ROTATION (deg)</span>
-                    <div class="input-row"><label>X</label><input type="number" id="rotX" step="15"
-                            onchange="updateRotation()"></div>
-                    <div class="input-row"><label>Y</label><input type="number" id="rotY" step="15"
-                            onchange="updateRotation()"></div>
-                    <div class="input-row"><label>Z</label><input type="number" id="rotZ" step="15"
-                            onchange="updateRotation()"></div>
+                    <div class="prop-card">
+                        <span class="prop-label"><i class="fa-solid fa-rotate"></i> Rotation <em class="unit-tag">deg</em></span>
+                        <div class="input-row"><label>X</label><input type="number" id="rotX" step="15"
+                                onchange="updateRotation()"></div>
+                        <div class="input-row"><label>Y</label><input type="number" id="rotY" step="15"
+                                onchange="updateRotation()"></div>
+                        <div class="input-row"><label>Z</label><input type="number" id="rotZ" step="15"
+                                onchange="updateRotation()"></div>
+                    </div>
 
-                    <span class="prop-label" style="margin-top:15px">DIMENSIONS (cm)</span>
-                    <div id="grp-radius" class="input-row"><label>R</label><input type="number" id="dimRadius"
-                            step="0.1" onchange="updateDims()"></div>
-                    <div id="grp-height" class="input-row"><label>H</label><input type="number" id="dimHeight"
-                            step="0.1" onchange="updateDims()"></div>
-                    <div id="grp-size" style="display:none;">
-                        <div class="input-row"><label>Sx</label><input type="number" id="sizeX" step="0.1"
-                                onchange="updateDims()"></div>
-                        <div class="input-row"><label>Sy</label><input type="number" id="sizeY" step="0.1"
-                                onchange="updateDims()"></div>
-                        <div class="input-row"><label>Sz</label><input type="number" id="sizeZ" step="0.1"
-                                onchange="updateDims()"></div>
+                    <div class="prop-card">
+                        <span class="prop-label"><i class="fa-solid fa-ruler-combined"></i> Dimensions <em class="unit-tag">cm</em></span>
+                        <div id="grp-radius" class="input-row"><label>R</label><input type="number" id="dimRadius"
+                                step="0.1" onchange="updateDims()"></div>
+                        <div id="grp-height" class="input-row"><label>H</label><input type="number" id="dimHeight"
+                                step="0.1" onchange="updateDims()"></div>
+                        <div id="grp-size" style="display:none;">
+                            <div class="input-row"><label>Sx</label><input type="number" id="sizeX" step="0.1"
+                                    onchange="updateDims()"></div>
+                            <div class="input-row"><label>Sy</label><input type="number" id="sizeY" step="0.1"
+                                    onchange="updateDims()"></div>
+                            <div class="input-row"><label>Sz</label><input type="number" id="sizeZ" step="0.1"
+                                    onchange="updateDims()"></div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="panel-view" class="prop-group" style="display:none;">
-                    <span class="prop-label">CAMERA PRESETS</span>
-                    <div class="btn-grid">
-                        <button class="cam-btn" onclick="setCamera('TOP')">Top</button>
-                        <button class="cam-btn" onclick="setCamera('FRONT')">Front</button>
-                        <button class="cam-btn" onclick="setCamera('SIDE')">Side</button>
-                        <button class="cam-btn" onclick="setCamera('ISO')">Iso</button>
+                    <div class="prop-card">
+                        <span class="prop-label"><i class="fa-solid fa-camera"></i> Camera Presets</span>
+                        <div class="btn-grid">
+                            <button class="cam-btn" onclick="setCamera('TOP')"><i class="fa-solid fa-arrow-down"></i> Top</button>
+                            <button class="cam-btn" onclick="setCamera('FRONT')"><i class="fa-solid fa-square"></i> Front</button>
+                            <button class="cam-btn" onclick="setCamera('SIDE')"><i class="fa-solid fa-caret-right"></i> Side</button>
+                            <button class="cam-btn" onclick="setCamera('ISO')"><i class="fa-solid fa-cube"></i> Iso</button>
+                        </div>
                     </div>
 
-                    <span class="prop-label">ZOOM</span>
-                    <div class="input-row">
-                        <input type="range" min="5" max="50" value="15" oninput="zoomCamera(this.value)"
-                            style="width:100%;">
+                    <!-- 1. Full-Row-Width Fit View Button -->
+                    <button class="cam-btn" onclick="recenterView()" title="Fit camera to scene" style="width: 100%; padding: 8px; margin-top: 4px; background: var(--bg-panel-raised);">
+                        <i class="fa-solid fa-expand"></i> Fit View
+                    </button>
+
+                    <div class="prop-card" style="margin-top: 4px;">
+                        <span class="prop-label"><i class="fa-solid fa-magnifying-glass"></i> Zoom</span>
+                        <div class="input-row">
+                            <input type="range" min="5" max="50" value="15" oninput="zoomCamera(this.value)" style="width:100%;">
+                        </div>
                     </div>
 
-                    <span class="prop-label" style="margin-top:15px">HELPERS</span>
-                    <div class="input-row" style="justify-content:flex-start;">
-                        <input type="checkbox" id="axisToggle" checked onchange="toggleAxes()"
-                            style="flex:0; width:auto; margin-right:8px;">
-                        <span>Show Axes</span>
+                    <!-- 2. Display & Render Mode Options -->
+                    <div class="prop-card" style="margin-top: 4px;">
+                        <span class="prop-label"><i class="fa-solid fa-eye"></i> Render Mode</span>
+                        <div class="input-row">
+                            <select id="renderModeToggle" onchange="setRenderMode()">
+                                <option value="shaded">Shaded (Default)</option>
+                                <option value="wireframe">Wireframe</option>
+                                <option value="bbox">Bounding Box</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <div class="prop-card" style="margin-top: 4px;">
+                        <span class="prop-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Helpers</span>
+                        <div class="input-row" style="justify-content:flex-start;">
+                            <input type="checkbox" id="axisToggle" checked onchange="toggleAxes()" style="flex:0; width:auto; margin-right:8px;">
+                            <span>Show Axes</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Save View / Capture Image Button -->
+                    <button class="cam-btn" onclick="captureImage()" title="Save current view as image" style="width: 100%; padding: 8px; margin-top: 4px; background: var(--bg-panel-raised);">
+                        <i class="fa-solid fa-image"></i> Capture Image
+                    </button>
                 </div>
             </div>
         </div>
 
         <footer>
+            <!-- Left Section: Status -->
+            <span class="status-led"></span>
             <span id="statusText">Ready. Full System Loaded.</span>
+            
+            <!-- Center Section: Spacer pushes the counter to the middle -->
+            <span class="footer-spacer"></span>
+            
+            <!-- Center Section: Metrics (Placeholder) -->
+            <span class="footer-tag" id="sceneMetrics" title="Scene Metrics">
+                <i class="fa-solid fa-shapes"></i> Objects: 0 &middot; Groups: 0
+            </span>
+            
+            <!-- Right Section: Spacer pushes the remaining items to the right edge -->
+            <span class="footer-spacer"></span>
+            
+            <!-- Right Section: Controls & Info -->
+            <button class="footer-btn" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+                <i class="fa-solid fa-sun" id="themeIcon"></i> Theme
+            </button>
+            <span class="footer-tag"><i class="fa-solid fa-ruler"></i> Units: cm / deg</span>
+            <span class="footer-tag"><i class="fa-solid fa-cube"></i> Engine: X3DOM</span>
         </footer>
     </div>
 
@@ -580,32 +684,37 @@
     <div id="modal-settings" class="modal-overlay" onclick="if(event.target===this)closeSettings()">
         <div class="modal-box">
             <h3><i class="fa-solid fa-gear"></i> Simulation Settings</h3>
+
+            <div class="modal-section-label">Monte Carlo Run Parameters</div>
             <div class="modal-row">
-                <label>Batches</label>
+                <label><i class="fa-solid fa-layer-group"></i> Batches</label>
                 <input type="number" id="setBatches" min="1" value="50">
             </div>
             <div class="modal-row">
-                <label>Particles / Batch</label>
+                <label><i class="fa-solid fa-circle-dot"></i> Particles / Batch</label>
                 <input type="number" id="setParticles" min="1" value="1000">
             </div>
             <div class="modal-row">
-                <label>Inactive Batches</label>
+                <label><i class="fa-solid fa-hourglass-half"></i> Inactive Batches</label>
                 <input type="number" id="setInactive" min="0" value="10">
             </div>
             <div class="modal-row">
-                <label>Run Mode</label>
+                <label><i class="fa-solid fa-play"></i> Run Mode</label>
                 <select id="setRunMode" onchange="toggleInactiveField()">
                     <option value="eigenvalue">K-Eigenvalue</option>
                     <option value="fixed">Fixed Source</option>
                 </select>
             </div>
+
+            <div class="modal-section-label">Boundary Conditions</div>
             <div class="modal-row">
-                <label>Boundary</label>
+                <label><i class="fa-solid fa-border-all"></i> Boundary</label>
                 <select id="setBoundary">
                     <option value="vacuum">Vacuum</option>
                     <option value="reflective">Reflective</option>
                 </select>
             </div>
+
             <div class="modal-actions">
                 <button class="modal-btn-save" onclick="saveSettings()"><i class="fa-solid fa-check"></i> Save</button>
                 <button class="modal-btn-cancel" onclick="closeSettings()">Cancel</button>
