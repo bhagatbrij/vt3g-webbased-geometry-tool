@@ -1,17 +1,69 @@
 /* =========================================
-    2. THEME VARIABLES (VS Code Dark)
+    0. FONTS
+    ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* =========================================
+    1. DESIGN TOKENS
+
+    Direction: this tool composes reactor-core geometry for a Monte
+    Carlo transport solver, so the palette borrows from the one thing
+    every reactor engineer recognizes on sight — the pale cyan
+    Cherenkov glow seen through the water of a spent-fuel pool. That
+    glow is used as the single accent against an instrument-panel
+    graphite body, with a fine blueprint grid underneath the UI.
+    Numeric/coordinate fields use a monospace face, like a CMM or CNC
+    readout, everything else uses a plain technical sans.
     ========================================= */
 :root {
-    --bg-app: #1e1e1e;
-    --bg-panel: #252526;
-    --bg-header: #333333;
-    --bg-input: #3c3c3c;
-    --accent: #007acc;
-    --text-main: #cccccc;
-    --text-mute: #858585;
-    --border: #3e3e42;
-    --hover: #2a2d2e;
-    --selected: #37373d;
+    /* Surfaces */
+    --bg-app: #0e1216;
+    --bg-app-grid: #11161b;
+    --bg-panel: #161b21;
+    --bg-panel-raised: #1c222a;
+    --bg-header: #0c1015;
+    --bg-input: #0a0d11;
+    --bg-input-focus: #0d1218;
+    --bg-hover: #1f2830;
+    --bg-selected: rgba(78, 205, 255, 0.10);
+
+    /* Borders */
+    --border: #262e37;
+    --border-strong: #37424e;
+    --border-hairline: rgba(255, 255, 255, 0.06);
+
+    /* Accent — "Cherenkov" cyan */
+    --accent: #4ecdff;
+    --accent-dim: #2e97c4;
+    --accent-soft: rgba(78, 205, 255, 0.16);
+    --accent-glow: rgba(78, 205, 255, 0.35);
+
+    /* Utility colors */
+    --warn: #f5b942;
+    --danger: #e5484d;
+    --danger-dim: #b7373b;
+    --success: #3ec87a;
+
+    /* Text */
+    --text-main: #dde3ea;
+    --text-mute: #8993a1;
+    --text-dim: #57626e;
+
+    /* Legacy variable names kept so anything referencing them resolves */
+    --hover: var(--bg-hover);
+    --selected: var(--bg-selected);
+
+    /* Type */
+    --font-ui: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+
+    /* Shape */
+    --radius: 4px;
+    --radius-lg: 6px;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body,
@@ -20,11 +72,37 @@ html {
     padding: 0;
     height: 100%;
     width: 100%;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: var(--font-ui);
     background: var(--bg-app);
     color: var(--text-main);
     overflow: hidden;
     font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Selection + scrollbars, instrument-panel styling throughout */
+::selection {
+    background: var(--accent-soft);
+    color: var(--text-main);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 5px;
+    border: 2px solid var(--bg-panel);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-dim);
 }
 
 /* =========================================
@@ -32,55 +110,183 @@ html {
     ========================================= */
 .app-grid {
     display: grid;
-    grid-template-rows: 35px 1fr 25px;
+    grid-template-rows: 58px 1fr 26px;
     height: 100vh;
+    /* Subtle blueprint/drafting-table grid behind the whole app */
+    background-image:
+        linear-gradient(var(--border-hairline) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-hairline) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-color: var(--bg-app-grid);
 }
 
 .main-area {
     display: grid;
-    grid-template-columns: 260px 1fr 300px;
+    grid-template-columns: 262px 1fr 302px;
     overflow: hidden;
 }
 
-/* Header */
+/* =========================================
+    4. HEADER / RIBBON
+    ========================================= */
 header {
-    background: var(--bg-header);
+    background: linear-gradient(180deg, var(--bg-header) 0%, #0a0d11 100%);
     border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 0 var(--border-hairline), 0 4px 12px rgba(0, 0, 0, 0.25);
     display: flex;
-    align-items: center;
-    padding: 0 15px;
+    align-items: stretch;
+    padding: 0 16px;
+    gap: 14px;
+    position: relative;
+    z-index: 5;
+}
+
+header::after {
+    /* Cherenkov accent hairline under the whole ribbon */
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-glow) 15%, var(--accent-glow) 45%, transparent 85%);
+    opacity: 0.6;
 }
 
 .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 14px;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.brand-icon {
+    font-size: 20px;
+    color: var(--accent);
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.brand-name {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #fff;
+    font-size: 15px;
+}
+
+.brand-sub {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-mute);
+}
+
+.ribbon {
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.ribbon-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 10px 5px;
+}
+
+.ribbon-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.ribbon-caption {
+    font-size: 9px;
     font-weight: 600;
-    color: white;
-    margin-right: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-dim);
 }
 
 .toolbar-btn {
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     color: var(--text-main);
-    padding: 5px 10px;
+    font-family: var(--font-ui);
+    padding: 6px 10px;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: var(--radius);
     display: flex;
     align-items: center;
     gap: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.toolbar-btn i {
+    color: var(--text-mute);
+    font-size: 12px;
+    transition: color 0.12s ease;
 }
 
 .toolbar-btn:hover {
-    background: var(--hover);
+    background: var(--bg-hover);
+    border-color: var(--border);
+}
+
+.toolbar-btn:hover i {
+    color: var(--accent);
+}
+
+.toolbar-btn:active {
+    background: var(--accent-soft);
 }
 
 .toolbar-sep {
     width: 1px;
-    height: 16px;
+    align-self: center;
+    height: 30px;
     background: var(--border);
-    margin: 0 10px;
+    margin: 0 4px;
+    flex-shrink: 0;
 }
 
-/* Panels */
+.header-tag {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    align-self: center;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--accent-dim);
+    background: var(--accent-soft);
+    border: 1px solid rgba(78, 205, 255, 0.25);
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.header-tag i {
+    font-size: 11px;
+}
+
+/* =========================================
+    5. PANELS (shared)
+    ========================================= */
 .panel {
     background: var(--bg-panel);
     display: flex;
@@ -91,15 +297,37 @@ header {
 }
 
 .panel-header {
-    padding: 10px;
-    font-weight: 600;
+    padding: 10px 12px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 11px;
+    letter-spacing: 0.6px;
+    font-size: 10.5px;
     color: var(--text-mute);
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    background: var(--bg-panel-raised);
+}
+
+.panel-header span {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.panel-header i {
+    color: var(--accent);
+    font-size: 11px;
+}
+
+.panel-header .fa-trash-can {
+    color: var(--text-dim);
+    cursor: pointer;
+}
+
+.panel-header .fa-trash-can:hover {
+    color: var(--danger);
 }
 
 /* Ensure tab content fills the remaining space */
@@ -120,41 +348,55 @@ header {
     padding: 10px;
 }
 
-/* Material Manager Styles */
+/* =========================================
+    6. MATERIAL MANAGER
+    ========================================= */
 .mat-list-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 8px;
+    padding: 7px 9px;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: var(--radius);
     border: 1px solid transparent;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    transition: background 0.12s ease, border-color 0.12s ease;
 }
 
 .mat-list-item:hover {
-    background: var(--hover);
+    background: var(--bg-hover);
 }
 
 .mat-list-item.selected {
-    background: var(--selected);
+    background: var(--bg-selected);
     border-color: var(--accent);
 }
 
 .mat-swatch {
     width: 14px;
     height: 14px;
-    border-radius: 2px;
-    border: 1px solid var(--border);
+    border-radius: 3px;
+    border: 1px solid var(--border-strong);
     flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
 .mat-form-section {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+}
+
+.mat-form-section:first-of-type {
     margin-top: 12px;
+    padding-top: 0;
+    border-top: none;
 }
 
 .mat-form-section .prop-label {
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .comp-row {
@@ -172,105 +414,177 @@ header {
 
 .comp-row .comp-del {
     flex: 0 0 24px;
-    background: #c0392b;
+    background: var(--danger-dim);
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--radius);
     cursor: pointer;
     font-size: 11px;
-    padding: 2px;
+    padding: 5px;
+    transition: background 0.12s ease;
+}
+
+.comp-row .comp-del:hover {
+    background: var(--danger);
 }
 
 .mat-btn {
     width: 100%;
-    padding: 7px;
-    border: none;
-    border-radius: 3px;
+    padding: 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
     cursor: pointer;
     color: white;
-    margin-top: 6px;
+    margin-top: 7px;
     font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-ui);
+    letter-spacing: 0.2px;
+    transition: filter 0.12s ease, background 0.12s ease;
+}
+
+.mat-btn:hover {
+    filter: brightness(1.12);
 }
 
 .mat-btn-save {
-    background: #27ae60;
+    background: var(--success);
+    color: #062616;
 }
 
 .mat-btn-del {
-    background: #c0392b;
+    background: var(--danger-dim);
 }
 
 .mat-btn-new {
-    background: var(--accent);
+    background: var(--accent-dim);
+    color: #04141c;
 }
 
-/* Tabs */
+/* =========================================
+    7. TABS
+    ========================================= */
 .universe-tabs,
 .inspector-tabs {
     display: flex;
-    background: var(--bg-header);
+    background: var(--bg-panel-raised);
+    border-bottom: 1px solid var(--border);
 }
 
 .u-tab,
 .i-tab {
     flex: 1;
-    padding: 8px;
+    padding: 9px 6px;
     text-align: center;
     cursor: pointer;
-    border-right: 1px solid #222;
-    opacity: 0.7;
+    border-right: 1px solid var(--border);
+    color: var(--text-mute);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-bottom: 2px solid transparent;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.u-tab:hover,
+.i-tab:hover {
+    color: var(--text-main);
+    background: var(--bg-hover);
 }
 
 .u-tab.active,
 .i-tab.active {
-    opacity: 1;
-    background: var(--bg-panel);
-    border-top: 2px solid var(--accent);
-    font-weight: 600;
     color: var(--accent);
+    background: var(--bg-panel);
+    border-bottom: 2px solid var(--accent);
 }
 
-/* Tree View */
+.u-tab i,
+.i-tab i {
+    font-size: 11px;
+}
+
+/* =========================================
+    8. TREE VIEW
+    ========================================= */
 .tree-view {
     flex: 1;
     overflow-y: auto;
-    padding: 5px;
+    padding: 8px 6px;
 }
 
 .tree-item {
-    padding: 4px 8px;
+    padding: 5px 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
-    border-radius: 3px;
-    margin-bottom: 2px;
+    border-radius: var(--radius);
+    margin-bottom: 1px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    border-left: 2px solid transparent;
+    transition: background 0.12s ease, border-color 0.12s ease;
 }
 
 .tree-item:hover {
-    background: var(--hover);
+    background: var(--bg-hover);
 }
 
 .tree-item.selected {
-    background: var(--selected);
-    color: white;
+    background: var(--bg-selected);
+    color: #fff;
     border-left: 2px solid var(--accent);
 }
 
-/* Indent children of a group */
+/* Indent children of a group, with a drafting-style guide line */
 .nested-group {
     margin-left: 15px;
     border-left: 1px solid var(--border);
-    padding-left: 5px;
+    padding-left: 6px;
+    display: block;
 }
 
 /* Style for the group header in the tree */
 .tree-item.is-group {
-    font-weight: bold;
+    font-weight: 700;
     color: var(--accent);
+    font-family: var(--font-ui);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-/* Viewport - CRITICAL FIX FOR ZOOM: ensure strict overflow handling */
+/* Tree Toggle */
+.tree-toggle {
+    cursor: pointer;
+    width: 16px;
+    text-align: center;
+    color: var(--text-dim);
+    margin-right: 2px;
+    transition: transform 0.2s, color 0.12s ease;
+    display: inline-block;
+}
+
+.tree-toggle:hover {
+    color: #fff;
+}
+
+.tree-toggle.expanded {
+    transform: rotate(90deg);
+}
+
+.nested-group.collapsed {
+    display: none;
+}
+
+/* =========================================
+    9. VIEWPORT
+    ========================================= */
 .viewport {
     position: relative;
     background: #000;
@@ -285,146 +599,357 @@ x3d {
     border: none;
 }
 
-/* Inspector Inputs */
+/* Viewfinder-style corner brackets — decorative instrumentation frame */
+.vp-corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0.55;
+}
+
+.vp-tl {
+    top: 10px;
+    left: 10px;
+    border-top: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+}
+
+.vp-tr {
+    top: 10px;
+    right: 10px;
+    border-top: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+}
+
+.vp-bl {
+    bottom: 10px;
+    left: 10px;
+    border-bottom: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+}
+
+.vp-br {
+    bottom: 10px;
+    right: 10px;
+    border-bottom: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+}
+
+.vp-hud {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    pointer-events: none;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.6px;
+    color: var(--text-mute);
+    background: rgba(10, 13, 17, 0.55);
+    border: 1px solid var(--border-hairline);
+    padding: 4px 10px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vp-hud i {
+    color: var(--accent);
+    font-size: 10px;
+}
+
+/* =========================================
+    10. INSPECTOR / PROPERTY CARDS
+    ========================================= */
 .prop-group {
-    padding: 15px;
-    border-bottom: 1px solid var(--border);
+    padding: 12px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.prop-card {
+    background: var(--bg-panel-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px;
 }
 
 .prop-label {
-    display: block;
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 9px;
     color: var(--text-mute);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.prop-label i {
+    color: var(--accent);
     font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
+    width: 12px;
+    text-align: center;
+}
+
+.unit-tag {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    color: var(--accent-dim);
+    background: var(--accent-soft);
+    padding: 1px 6px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    margin-left: auto;
 }
 
 .input-row {
     display: flex;
-    gap: 5px;
+    gap: 6px;
     margin-bottom: 8px;
     align-items: center;
 }
 
-.input-row label {
-    width: 15px;
-    color: var(--text-mute);
+.input-row:last-child {
+    margin-bottom: 0;
 }
 
+.input-row label {
+    width: 16px;
+    color: var(--text-mute);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.icon-btn-danger {
+    background: var(--danger-dim);
+    border: none;
+    color: white;
+    border-radius: var(--radius);
+    cursor: pointer;
+    margin-left: 2px;
+    padding: 6px 10px;
+    transition: background 0.12s ease;
+}
+
+.icon-btn-danger:hover {
+    background: var(--danger);
+}
+
+/* =========================================
+    11. FORM CONTROLS
+    ========================================= */
 input[type="text"],
 input[type="number"],
 select {
     background: var(--bg-input);
     border: 1px solid var(--border);
-    color: white;
-    padding: 4px 6px;
-    border-radius: 2px;
+    color: var(--text-main);
+    padding: 6px 8px;
+    border-radius: var(--radius);
     flex: 1;
     width: 100%;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    transition: border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
 }
 
-input:focus {
-    outline: 1px solid var(--accent);
+select {
+    font-family: var(--font-ui);
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+    color: var(--text-dim);
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--bg-input-focus);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input:hover,
+select:hover {
+    border-color: var(--border-strong);
+}
+
+input[type="checkbox"] {
+    accent-color: var(--accent);
+}
+
+input[type="range"] {
+    accent-color: var(--accent);
+    background: transparent;
 }
 
 /* Camera Buttons */
 .btn-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    margin-bottom: 10px;
+    gap: 6px;
 }
 
 .cam-btn {
-    background: #333;
-    color: #ccc;
-    border: 1px solid #444;
-    padding: 4px;
+    background: var(--bg-input);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 7px 4px;
     cursor: pointer;
     font-size: 11px;
-    border-radius: 2px;
+    font-weight: 600;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.cam-btn i {
+    color: var(--text-mute);
+    font-size: 10px;
 }
 
 .cam-btn:hover {
-    background: #444;
+    background: var(--bg-hover);
+    border-color: var(--accent-dim);
+    color: var(--accent);
 }
 
-/* Footer */
-footer {
-    background: var(--accent);
-    color: white;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    font-size: 11px;
+.cam-btn:hover i {
+    color: var(--accent);
 }
 
 /* =========================================
-    5. NEW UI ELEMENTS (Accordion & Tree)
+    12. FOOTER
+    ========================================= */
+footer {
+    background: var(--bg-header);
+    border-top: 1px solid var(--border);
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 11px;
+    gap: 8px;
+}
+
+.status-led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+    flex-shrink: 0;
+}
+
+#statusText {
+    color: var(--text-main);
+}
+
+.footer-spacer {
+    flex: 1;
+}
+
+.footer-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-mute);
+    padding-left: 10px;
+    border-left: 1px solid var(--border);
+}
+
+.footer-tag i {
+    color: var(--accent-dim);
+    font-size: 10px;
+}
+
+/* =========================================
+    13. ACCORDION (Presets panel)
     ========================================= */
 .accordion-header {
-    background: #2d2d2d;
-    border: 1px solid #3e3e42;
-    padding: 8px;
+    background: var(--bg-panel-raised);
+    border: 1px solid var(--border);
+    padding: 9px 10px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 3px;
-    margin-bottom: 2px;
-    color: #eee;
+    border-radius: var(--radius);
+    margin-bottom: 3px;
+    color: var(--text-main);
+    transition: background 0.12s ease, border-color 0.12s ease;
 }
 
 .accordion-header:hover {
-    background: #3a3a3a;
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+}
+
+.accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.accordion-title i {
+    color: var(--accent);
+    font-size: 12px;
+    width: 14px;
+    text-align: center;
+}
+
+.accordion-chevron {
+    color: var(--text-dim);
+    font-size: 11px;
+    transition: transform 0.15s ease;
 }
 
 .accordion-content {
-    border: 1px solid #3e3e42;
+    border: 1px solid var(--border);
     border-top: none;
-    padding: 10px;
-    background: #222;
-    margin-bottom: 5px;
+    padding: 12px 10px;
+    background: var(--bg-panel);
+    margin-bottom: 6px;
+    margin-top: -3px;
+    border-radius: 0 0 var(--radius) var(--radius);
     display: none;
-    /* Hidden by default */
 }
 
 .accordion-content.active {
     display: block;
 }
 
-/* Tree Toggle */
-.tree-toggle {
-    cursor: pointer;
-    width: 16px;
-    text-align: center;
-    color: #888;
-    margin-right: 2px;
-    transition: transform 0.2s;
-    display: inline-block;
+.accordion-content .prop-label {
+    margin-top: 14px;
 }
 
-.tree-toggle:hover {
-    color: #fff;
+.accordion-content .prop-label:first-child {
+    margin-top: 2px;
 }
 
-.tree-toggle.expanded {
-    transform: rotate(90deg);
-}
-
-.nested-group {
-    display: block;
-}
-
-/* Default open, JS can toggle */
-.nested-group.collapsed {
-    display: none;
-}
-
-/* Settings Modal */
+/* =========================================
+    14. SETTINGS MODAL
+    ========================================= */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -432,7 +957,8 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(6, 8, 11, 0.72);
+    backdrop-filter: blur(2px);
     z-index: 9999;
     justify-content: center;
     align-items: center;
@@ -444,19 +970,41 @@ footer {
 
 .modal-box {
     background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
     padding: 20px 24px;
-    width: 340px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    width: 360px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--border-hairline);
 }
 
 .modal-box h3 {
-    margin: 0 0 16px 0;
-    color: var(--accent);
+    margin: 0 0 14px 0;
+    color: var(--text-main);
     font-size: 14px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-box h3 i {
+    color: var(--accent);
+}
+
+.modal-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--accent-dim);
+    margin: 14px 0 8px;
+}
+
+.modal-section-label:first-of-type {
+    margin-top: 2px;
 }
 
 .modal-row {
@@ -467,19 +1015,29 @@ footer {
 }
 
 .modal-row label {
-    width: 120px;
+    width: 140px;
     flex-shrink: 0;
     font-size: 12px;
-    color: var(--text-main);
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.modal-row label i {
+    color: var(--accent-dim);
+    font-size: 11px;
+    width: 12px;
+    text-align: center;
 }
 
 .modal-row input,
 .modal-row select {
     flex: 1;
-    padding: 5px 8px;
+    padding: 6px 8px;
     background: var(--bg-input);
     border: 1px solid var(--border);
-    border-radius: 3px;
+    border-radius: var(--radius);
     color: var(--text-main);
     font-size: 12px;
 }
@@ -493,25 +1051,250 @@ footer {
 .modal-actions {
     display: flex;
     gap: 8px;
-    margin-top: 16px;
+    margin-top: 18px;
 }
 
 .modal-actions button {
     flex: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 3px;
+    padding: 9px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
     cursor: pointer;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: filter 0.12s ease, background 0.12s ease;
+}
+
+.modal-actions button:hover {
+    filter: brightness(1.1);
 }
 
 .modal-btn-save {
-    background: #27ae60;
-    color: white;
+    background: var(--success);
+    color: #062616;
 }
 
 .modal-btn-cancel {
     background: var(--bg-input);
     color: var(--text-main);
+    border-color: var(--border);
+}
+
+/* =========================================
+    15. EXPORT DROPDOWN MODULE
+    ========================================= */
+.export-module {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+    margin-left: auto; /* Pushes the module to the far right edge */
+    align-self: center;
+}
+
+.export-split-btn {
+    display: flex;
+    align-items: stretch;
+    background: var(--bg-panel-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    position: relative;
+    transition: border-color 0.12s ease;
+}
+
+.export-split-btn:hover {
+    border-color: var(--accent);
+}
+
+.export-main {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-ui);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-right: 1px solid var(--border-strong);
+    border-radius: var(--radius) 0 0 var(--radius);
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.export-main i {
+    color: var(--accent);
+}
+
+.export-main:hover {
+    background: var(--bg-hover);
+    color: var(--accent);
+}
+
+.export-main:active {
+    background: var(--accent-soft);
+}
+
+.export-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-mute);
+    padding: 0 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.export-toggle:hover {
+    background: var(--bg-hover);
+    color: var(--accent);
+}
+
+.export-toggle:active {
+    background: var(--accent-soft);
+}
+
+.export-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-panel-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    display: none;
+    flex-direction: column;
+    min-width: 175px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border-hairline);
+    z-index: 100;
+    padding: 6px;
+}
+
+.export-dropdown-menu.show {
+    display: flex;
+}
+
+.dropdown-item {
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    color: var(--text-main);
+    font-size: 12px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    text-align: left;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.dropdown-item i {
+    color: var(--text-mute);
+    width: 14px;
+    text-align: center;
+    transition: color 0.12s ease;
+}
+
+.dropdown-item:hover {
+    background: var(--bg-hover);
+    color: #fff;
+}
+
+.dropdown-item:hover i {
+    color: var(--accent);
+}
+
+/* =========================================
+    16. BOTTOM BAR ADDITIONS
+    ========================================= */
+.footer-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-mute);
+    padding: 3px 8px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 10px;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.footer-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-main);
+    border-color: var(--border-strong);
+}
+
+.footer-btn:active {
+    background: var(--accent-soft);
+}
+
+/* =========================================
+    17. LIGHT THEME (PRESENTATION MODE)
+    ========================================= */
+body.light-theme {
+    /* Surfaces */
+    --bg-app: #f1f5f9;
+    --bg-app-grid: #e2e8f0;
+    --bg-panel: #ffffff;
+    --bg-panel-raised: #f8fafc;
+    --bg-header: #f8fafc;
+    --bg-input: #ffffff;
+    --bg-input-focus: #f1f5f9;
+    --bg-hover: #f1f5f9;
+    --bg-selected: rgba(2, 132, 199, 0.15);
+
+    /* Borders */
+    --border: #cbd5e1;
+    --border-strong: #94a3b8;
+    --border-hairline: rgba(0, 0, 0, 0.08);
+
+    /* Accent — Deepened Cyan for light mode readability */
+    --accent: #0284c7; 
+    --accent-dim: #0369a1;
+    --accent-soft: rgba(2, 132, 199, 0.12);
+    --accent-glow: rgba(2, 132, 199, 0.25);
+
+    /* Text */
+    --text-main: #0f172a;
+    --text-mute: #64748b;
+    --text-dim: #94a3b8;
+}
+
+/* Specific component overrides for light theme readability */
+body.light-theme header {
+    background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-app) 100%);
+}
+
+body.light-theme .brand-name,
+body.light-theme .tree-item.selected {
+    color: var(--text-main);
+}
+
+body.light-theme .viewport {
+    background: #ffffff;
+}
+
+body.light-theme .vp-hud {
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text-main);
+    border-color: var(--border);
 }
